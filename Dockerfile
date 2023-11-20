@@ -1,22 +1,21 @@
-# syntax=docker/dockerfile:1.3-labs
-FROM rust:1.72.1-bullseye AS build
+FROM docker.io/library/rust:1.72.1-bullseye AS build
 
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt-get update \
-    && apt-get install -y ca-certificates-java nodejs openjdk-17-jdk \
-    && rm -rf /var/lib/apt/lists/* \
-    && npm install -g yarn \
-    && cargo install just
+  && apt-get update \
+  && apt-get install -y ca-certificates-java nodejs openjdk-17-jdk \
+  && rm -rf /var/lib/apt/lists/* \
+  && npm install -g yarn \
+  && cargo install just
 
 COPY . /opt/warpgate
 
 RUN cd /opt/warpgate \
-    && just yarn --network-timeout 1000000000 \
-    && just openapi \
-    && just yarn build \
-    && cargo build --features mysql,postgres --release
+  && just yarn --network-timeout 1000000000 \
+  && just openapi \
+  && just yarn build \
+  && cargo build --features mysql,postgres --release
 
 FROM debian:bullseye-20221024
 LABEL maintainer=heywoodlh
