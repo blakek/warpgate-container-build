@@ -2,6 +2,13 @@ FROM docker.io/library/debian:bookworm
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN <<EOF
+  set -xe
+  apt-get -y update -qq
+  apt-get install --no-install-recommends -y \
+    ca-certificates \
+    curl
+  apt clean
+
   echo "Downloading warpgate…"
   warpgate_version="v0.8.1"
   arch="arm64"
@@ -18,4 +25,3 @@ ENV DOCKER 1
 
 ENTRYPOINT ["warpgate", "--config", "/data/warpgate.yaml"]
 CMD ["run"]
-
