@@ -1,35 +1,16 @@
-FROM docker.io/library/rust:1.72.1-bullseye AS build
-
-ENV DEBIAN_FRONTEND noninteractive
-
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
-  && apt-get update \
-  && apt-get install -y ca-certificates-java nodejs openjdk-17-jdk \
-  && rm -rf /var/lib/apt/lists/* \
-  && npm install -g yarn \
-  && cargo install just
-
-COPY . /opt/warpgate
-
-RUN cd /opt/warpgate \
-  && just yarn --network-timeout 1000000000 \
-  && just openapi \
-  && just yarn build \
-  && cargo build --features mysql,postgres --release
-
-FROM debian:bullseye-20221024
-LABEL maintainer=heywoodlh
+FROM docker.io/library/debian:bookworm
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN <<EOF
-  set -xe
-  apt-get -y update -qq
-  apt-get install --no-install-recommends -y \
-    ca-certificates
-  apt clean
-EOF
+  echo "Downloading warpgate…"
+  warpgate_version="v0.8.1"
+  arch="arm64"
 
-COPY --from=build /opt/warpgate/target/release/warpgate /usr/local/bin/warpgate
+  download_url="https://github.com/warp-tech/warpgate/releases/download/{$warpgate_version}/warpgate-{$warpgate_version}-{$arch}-linux"
+  
+  curl --silent --show-error --location --fail --output /usr/local/bin/warpgate "$download_url"
+  chmod +x /usr/local/bin/warpgate
+EOF
 
 VOLUME /data
 
