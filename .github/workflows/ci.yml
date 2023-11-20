@@ -35,7 +35,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: blakek13/warpgate
+          images: ghcr.io/blakek/warpgate
           tags: |
             type=ref,event=branch
             type=raw,value=latest,enable={{is_default_branch}}
