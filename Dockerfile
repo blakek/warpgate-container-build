@@ -1,23 +1,9 @@
 FROM docker.io/library/debian:bookworm
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN <<EOF
-  set -xe
-  apt-get -y update -qq
-  apt-get install --no-install-recommends -y \
-    ca-certificates \
-    curl
-  apt clean
 
-  echo "Downloading warpgate…"
-  warpgate_version="v0.8.1"
-  arch="arm64"
-
-  download_url="https://github.com/warp-tech/warpgate/releases/download/{$warpgate_version}/warpgate-{$warpgate_version}-{$arch}-linux"
-  
-  curl --silent --show-error --location --fail --output /usr/local/bin/warpgate "$download_url"
-  chmod +x /usr/local/bin/warpgate
-EOF
+ADD https://github.com/warp-tech/warpgate/releases/download/v0.8.1/warpgate-v0.8.1-arm64-linux /usr/local/bin/warpgate
+RUN chmod +x /usr/local/bin/warpgate
 
 VOLUME /data
 
